@@ -38,7 +38,7 @@ Param(
 
 # Create the Header object and add the authorization header
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-$headers.Add("Authorization", "sso-key ${key}:${secureSecret}")
+$headers.Add("Authorization", "sso-key ${key}:${secret}")
 
 # Get the IP from http://ipinfo.io/json
 $ip = Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip
