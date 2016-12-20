@@ -25,8 +25,8 @@ Param(
     # The TTL in seconds. This defaults to 600 in the script, but GoDaddy defaults to 3600.
     [int] $ttl = 600,
     
-    # The Key generated from https://developer.godaddy.com/keys/
-    [Parameter(Mandatory = $true,HelpMessage = "The Key generated from https://developer.godaddy.com/keys/")]
+    # The production Key generated from https://developer.godaddy.com/keys/
+    [Parameter(Mandatory = $true,HelpMessage = "The production Key generated from https://developer.godaddy.com/keys/")]
     [ValidateNotNullorEmpty()]
     [string] $key,
     
