@@ -1,5 +1,5 @@
 # https://github.com/chadbirch/GoDaddy-DDNS-Automation
-# Copyright 2016 - Chad Birch
+# Copyright 2018 - Chad Birch
 # 
 # Script references:
 #   https://www.jokecamp.com/blog/invoke-restmethod-powershell-examples/
@@ -43,22 +43,19 @@ $headers.Add("Authorization", "sso-key ${key}:${secret}")
 # Get the IP from http://ipinfo.io/json
 $ip = Invoke-RestMethod http://ipinfo.io/json | Select-Object -exp ip
 
-# Create the body for the request. This can be an array or a single object.
-$body = @{
-type=$recordType
-name=$record
-data=$ip
-ttl=$ttl
-}
-
-# Convert the body to JSON.
-$json = $body | ConvertTo-Json
-
 try {
 
+    # Capture existing record
+    $dnsRecord = Invoke-RestMethod "https://api.godaddy.com/v1/domains/$domain/records/$recordType/$record" -Method Get -Headers $headers
+
+    # Modify the `data` property with the new IP address
+    $dnsRecord[0].data = $ip
+
+    # Convert to JSON
+    $json = $dnsRecord | ConvertTo-Json
+
     # Call the Put method for the specified domain with the body and headers defined above.
-    Invoke-RestMethod "https://api.godaddy.com/v1/domains/$domain/records/$recordType/$record" -Method Put -Headers $headers -Body $json -ContentType 'application/json'
-    # TODO: Capture response and check for 200.
+    Invoke-RestMethod "https://api.godaddy.com/v1/domains/$domain/records/$recordType/$record" -Method Put -Headers $headers -Body [$json] -ContentType 'application/json'
 
     # Call the Get method to show the output of the call`
     Invoke-RestMethod "https://api.godaddy.com/v1/domains/$domain/records/$recordType/$record" -Method Get -Headers $headers
@@ -68,5 +65,7 @@ try {
 } catch {
 
     # If the call fails, return and Exit Code of 1
+    Write-Host "StatusCode:" $_.Exception.Response.StatusCode.value__ 
+    Write-Host "StatusDescription:" $_.Exception.Response.StatusDescription
     exit 1
 }
